@@ -1,25 +1,36 @@
-import logo from './logo.svg';
+import React, { useState } from 'react';
+import TranslationInput from './TranslationInput';
+import TranslationResult from './TranslationResult';
+import axios from 'axios';
 import './App.css';
 
-function App() {
+const App = () => {
+  const [result, setResult] = useState('');
+
+  const handleTranslate = async ({ text, sourceLang, targetLang }) => {
+    if (text.trim() === '') {
+      setResult('');
+      return;
+    }
+    try {
+      const response = await axios.post('http://localhost:8000/translate', {
+        text,
+        sourceLang,
+        targetLang,
+      });
+      setResult(response.data.translation);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <h1>Cohere Language Translator</h1>
+      <TranslationInput onTranslate={handleTranslate} />
+      <TranslationResult result={result} />
     </div>
   );
-}
+};
 
 export default App;
